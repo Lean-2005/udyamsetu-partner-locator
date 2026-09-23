@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UdyamSetu | Partner Locator</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#f5f7fb;color:#172033}
+.header{background:linear-gradient(135deg,#123c73,#1d66a8);color:#fff;padding:22px 6%;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:25px;font-weight:800}.tag{font-size:12px;background:#fff2;border:1px solid #ffffff44;padding:7px 11px;border-radius:20px}
+.container{max-width:1280px;margin:24px auto;padding:0 20px}.notice{background:#fff7df;border:1px solid #efd17a;padding:13px 16px;border-radius:12px;color:#6b5100;margin-bottom:18px}
+.searchbox{background:#fff;border-radius:16px;padding:18px;box-shadow:0 5px 18px #18243a12;display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:12px}
+input,select,button{height:44px;border:1px solid #d7dce5;border-radius:9px;padding:0 12px;font-size:14px}
+button{background:#1669b2;color:white;border:0;font-weight:700;cursor:pointer}.layout{display:grid;grid-template-columns:1.05fr 1.4fr;gap:18px;margin-top:18px}
+.panel{background:#fff;border-radius:16px;box-shadow:0 5px 18px #18243a12;overflow:hidden}.map{min-height:610px;background:#eaf1f8;position:relative;padding:20px;overflow:hidden}
+.map:before{content:"";position:absolute;inset:0;background-image:linear-gradient(#ffffff77 1px,transparent 1px),linear-gradient(90deg,#ffffff77 1px,transparent 1px);background-size:45px 45px}
+.road{position:absolute;background:#fff;transform:rotate(-18deg);width:120%;height:25px;top:45%;left:-10%;box-shadow:0 2px 4px #0001}.road2{top:65%;transform:rotate(23deg)}
+.map-title{position:relative;z-index:2;background:#fff;padding:10px 13px;border-radius:10px;display:inline-block;font-weight:700}
+.pin{position:absolute;z-index:3;width:36px;height:36px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;box-shadow:0 3px 8px #0003}
+.pin span{transform:rotate(45deg)}.p1{left:25%;top:28%;background:#169b62}.p2{left:61%;top:35%;background:#169b62}.p3{left:46%;top:53%;background:#e2a400}.p4{left:74%;top:67%;background:#d94b4b}.p5{left:31%;top:72%;background:#169b62}
+.list{padding:16px;max-height:610px;overflow:auto}.card{border:1px solid #e4e8ef;border-radius:13px;padding:15px;margin-bottom:12px;cursor:pointer}.card:hover{border-color:#2380c8;box-shadow:0 3px 12px #2380c822}
+.cardhead{display:flex;justify-content:space-between;gap:10px}.name{font-weight:800}.meta{font-size:12px;color:#667085;margin-top:4px}.badge{font-size:11px;font-weight:800;padding:5px 8px;border-radius:20px;white-space:nowrap}.ok{background:#e4f7ed;color:#087443}.bad{background:#fde8e8;color:#b42318}.unknown{background:#fff4d6;color:#8a6500}
+.checks{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.check{font-size:11px;background:#f1f4f8;padding:5px 7px;border-radius:6px;color:#475467}
+.detail{margin-top:14px;padding:14px;background:#f7f9fc;border-radius:10px;font-size:12px;line-height:1.55}.route{color:#1669b2;font-weight:700;margin-top:8px}
+.footer{font-size:12px;color:#667085;padding:20px 0}.stats{display:flex;gap:10px;margin:15px 0}.stat{flex:1;background:#fff;border-radius:12px;padding:12px;box-shadow:0 3px 12px #18243a0c}.num{font-size:22px;font-weight:800}.lbl{font-size:11px;color:#667085}
+@media(max-width:900px){.searchbox,.layout{grid-template-columns:1fr}.map{min-height:400px}}
+</style>
+</head>
+<body>
+<header class="header"><div class="logo">UdyamSetu</div><div class="tag">SIH 2026 • Partner Locator</div></header>
+<main class="container">
+<div class="notice"><b>DEMO DATA — NOT LIVE NSFDC STATUS.</b> Partner eligibility is shown only from the prototype status dataset. Unverified partners are never presented as eligible.</div>
+
+<div class="searchbox">
+<input id="location" placeholder="Enter city / PIN / location" value="Mumbai">
+<select id="scheme"><option value="">All schemes</option><option>NSFDC Term Loan</option><option>NSFDC Microfinance</option><option>PM-SURAJ</option></select>
+<select id="status"><option value="">All statuses</option><option value="VERIFIED_ELIGIBLE">Verified Eligible</option><option value="VERIFIED_NOT_ELIGIBLE">Verified Not Eligible</option><option value="NOT_VERIFIED">Status Not Verified</option></select>
+<button onclick="filterPartners()">Find Partners</button>
+</div>
+
+<div class="stats">
+<div class="stat"><div class="num" id="eligible">0</div><div class="lbl">Verified Eligible</div></div>
+<div class="stat"><div class="num" id="verified">0</div><div class="lbl">Verified / Not Eligible</div></div>
+<div class="stat"><div class="num" id="unverified">0</div><div class="lbl">Status Not Verified</div></div>
+</div>
+
+<section class="layout">
+<div class="panel map">
+<div class="map-title">📍 Partner coverage map • Maharashtra DEMO</div>
+<div class="road"></div><div class="road road2"></div>
+<div class="pin p1"><span>1</span></div><div class="pin p2"><span>2</span></div>
+<div class="pin p3"><span>3</span></div><div class="pin p4"><span>4</span></div><div class="pin p5"><span>5</span></div>
+</div>
+<div class="panel list" id="list"></div>
+</section>
+
+<div class="footer">
+Routing logic: Authorized → Scheme compatible → VERIFIED_ELIGIBLE → Geographic proximity → Top suitable partners.
+Final lending approval remains with the authorized Channel Partner. Production should replace this demo status layer with an authorized NSFDC feed.
+</div>
+</main>
+<script>
+const partners = [
+{"id":"P001","name":"Maharashtra State Channelising Agency","type":"SCA","city":"Mumbai","status":"VERIFIED_ELIGIBLE","authorized":true,"scheme":"PM-SURAJ;NSFDC Term Loan","checks":["No overdues ✓","100% utilization ✓","Guarantee ✓"],"source":"NSFDC authorized status feed (DEMO)","date":"22 Sep 2026"},
+{"id":"P002","name":"Maharashtra Gramin Bank","type":"RRB","city":"Thane","status":"VERIFIED_ELIGIBLE","authorized":true,"scheme":"NSFDC Term Loan","checks":["No overdues ✓","100% utilization ✓","Guarantee ✓","RRB checks ✓"],"source":"Official/authorized partner evidence (DEMO)","date":"22 Sep 2026"},
+{"id":"P003","name":"Konkan Cooperative Bank","type":"Cooperative Bank","city":"Palghar","status":"NOT_VERIFIED","authorized":true,"scheme":"NSFDC Term Loan;PM-SURAJ","checks":["Status not verified"],"source":"No sufficiently current authorized evidence","date":"22 Sep 2026"},
+{"id":"P004","name":"Western India Small Finance Bank","type":"Small Finance Bank","city":"Navi Mumbai","status":"VERIFIED_NOT_ELIGIBLE","authorized":true,"scheme":"NSFDC Term Loan","checks":["No overdues ✕","100% utilization ✓","Guarantee ✓"],"source":"Authorized status evidence (DEMO)","date":"22 Sep 2026"},
+{"id":"P005","name":"Sahyadri NBFC-MFI","type":"NBFC-MFI","city":"Nashik","status":"VERIFIED_ELIGIBLE","authorized":true,"scheme":"NSFDC Microfinance","checks":["No pending utilization >1 yr ✓","100% utilization ✓","No overdues ✓"],"source":"NSFDC/partner evidence (DEMO)","date":"22 Sep 2026"},
+{"id":"P006","name":"Vidarbha Rural Finance","type":"RRB","city":"Nagpur","status":"NOT_VERIFIED","authorized":true,"scheme":"NSFDC Term Loan","checks":["Status not verified"],"source":"Supporting financial evidence only","date":"22 Sep 2026"},
+{"id":"P007","name":"Maharashtra Cooperative Finance Society","type":"Cooperative Society","city":"Pune","status":"VERIFIED_NOT_ELIGIBLE","authorized":false,"scheme":"NSFDC Term Loan","checks":["Authorization ✕"],"source":"Authorization/status evidence (DEMO)","date":"22 Sep 2026"},
+{"id":"P008","name":"Bharat Community Finance","type":"NBFC-MFI","city":"Aurangabad","status":"VERIFIED_ELIGIBLE","authorized":true,"scheme":"NSFDC Microfinance","checks":["No pending utilization >1 yr ✓","100% utilization ✓","No overdues ✓"],"source":"NSFDC/partner evidence (DEMO)","date":"22 Sep 2026"},
+{"id":"P009","name":"Maharashtra Rural Development Bank","type":"RRB","city":"Kolhapur","status":"VERIFIED_ELIGIBLE","authorized":true,"scheme":"NSFDC Term Loan","checks":["No overdues ✓","100% utilization ✓","Guarantee ✓","RRB checks ✓"],"source":"Official/authorized partner evidence (DEMO)","date":"22 Sep 2026"},
+{"id":"P010","name":"Coastal District Cooperative Bank","type":"Cooperative Bank","city":"Ratnagiri","status":"NOT_VERIFIED","authorized":true,"scheme":"PM-SURAJ","checks":["Status not verified"],"source":"Status source unavailable for demo","date":"22 Sep 2026"}
+];
+function badge(s){return s==="VERIFIED_ELIGIBLE"?'<span class="badge ok">VERIFIED ELIGIBLE</span>':s==="VERIFIED_NOT_ELIGIBLE"?'<span class="badge bad">VERIFIED NOT ELIGIBLE</span>':'<span class="badge unknown">STATUS NOT VERIFIED</span>'}
+function render(data){
+document.getElementById("list").innerHTML=data.map(p=>`
+<div class="card">
+<div class="cardhead"><div><div class="name">${p.name}</div><div class="meta">${p.type} • ${p.city} • Partner ID ${p.id}</div></div>${badge(p.status)}</div>
+<div class="checks">${p.checks.map(x=>`<span class="check">${x}</span>`).join("")}</div>
+<div class="detail"><b>Supported schemes:</b> ${p.scheme}<br><b>Source:</b> ${p.source}<br><b>Status verified:</b> ${p.date}
+<div class="route">${p.status==="VERIFIED_ELIGIBLE"?"✓ Eligible for verified routing":"⚠ Not included in verified routing"}</div></div>
+</div>`).join("") || "<p>No matching partners found.</p>";
+document.getElementById("eligible").textContent=data.filter(x=>x.status==="VERIFIED_ELIGIBLE").length;
+document.getElementById("verified").textContent=data.filter(x=>x.status==="VERIFIED_NOT_ELIGIBLE").length;
+document.getElementById("unverified").textContent=data.filter(x=>x.status==="NOT_VERIFIED").length;
+}
+function filterPartners(){
+let s=document.getElementById("scheme").value, st=document.getElementById("status").value, loc=document.getElementById("location").value.toLowerCase();
+let d=partners.filter(p=>(!s||p.scheme.includes(s))&&(!st||p.status===st)&&(!loc||p.city.toLowerCase().includes(loc)||p.name.toLowerCase().includes(loc)));
+render(d);
+}
+render(partners);
+</script>
+</body></html>
